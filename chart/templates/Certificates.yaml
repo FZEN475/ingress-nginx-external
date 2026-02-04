@@ -1,0 +1,30 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cm-{{ .Release.Name }}-tls
+  namespace: {{ .Release.Namespace }}
+spec:
+  additionalOutputFormats:
+    - type: CombinedPEM
+  dnsNames:
+    - "{{ .Release.Name }}-controller.provisioners.svc"
+    - "{{ .Release.Name }}-controller-admission.provisioners.svc"
+    - "{{ .Release.Name }}-controller-metrics.provisioners.svc"
+  emailAddresses:
+    - admin@fzen.pro
+  ipAddresses:
+    - 127.0.0.1
+  isCA: false
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: root-intermediate0-ci
+  secretName: cm-ingress-nginx-external-tls
+  subject:
+    organizations:
+      - cert-manager
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+    - client auth

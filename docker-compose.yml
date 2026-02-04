@@ -1,0 +1,39 @@
+
+services:
+  ingress-nginx-external:
+    image: ghcr.io/fzen475/helm-test-local:latest
+    container_name: helm-ingress-nginx-external
+    env_file: ./.env
+    environment:
+      TRACE: false
+      CUSTOM_CA_CERTS: "/tmp/ca.crt"
+      KUBECONFIG: "/root/.kube/config"
+      
+      HELM_REPOS: "ingress-nginx@https://kubernetes.github.io/ingress-nginx" # "extra_chart_1@oci:// extra_chart_2@oci://"
+      # helm $ENV_VALUES $HELM_COMMON_VALUES $ENV_NAMESPACE $HELM_DEPLOY_ARGS $ENV_APP_NAME $HELM_DEPLOY_CHART
+      ENV_VALUES: ""
+      ENV_NAMESPACE: "provisioners"
+      ENV_APP_NAME: "ingress-nginx-external"
+      HELM_DEPLOY_CHART: "./chart/" # ./chart/ или gitlab/gitlab
+
+      DELETE_HELM: false
+      HELM_DELETE_ARGS: ""
+
+      INSTALL_HELM: true
+      HELM_DEPLOY_ARGS: '--wait=false --timeout 10m0s'
+    volumes:
+      - /tmp/ingress-nginx-external:/source
+    secrets:
+      - source: kubeconfig
+        target: /root/.kube/config
+        mode: 0600
+      - source: ca.crt
+        target: /tmp/ca.crt
+        mode: 0600
+
+
+secrets:
+  kubeconfig:
+    file: /root/.kube/config
+  ca.crt:
+    file: /etc/ssl/certs/ca.crt
